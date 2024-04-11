@@ -22,11 +22,16 @@ func NewMqttClient(mc *MqttClient) mqtt.Client {
 	if mc.Port == 1883 {
 		opts.AddBroker(fmt.Sprintf("tcp://%s:%d", mc.Broker, mc.Port))
 	} else {
-		// 自定义端口
-		opts.AddBroker(fmt.Sprintf("ssl://%s:%d", mc.Broker, mc.Port))
-		// 设置 TLS/SSL
-		tlsConfig := NewSingleTlsConfig(mc.Ca)
-		opts.SetTLSConfig(tlsConfig)
+		if mc.Ca != "" {
+			// 自定义端口
+			opts.AddBroker(fmt.Sprintf("ssl://%s:%d", mc.Broker, mc.Port))
+			// 设置 TLS/SSL
+			tlsConfig := NewSingleTlsConfig(mc.Ca)
+			opts.SetTLSConfig(tlsConfig)
+		} else {
+			// 自定义端口
+			opts.AddBroker(fmt.Sprintf("mqtt://%s:%d", mc.Broker, mc.Port))
+		}
 	}
 
 	// 设置 client_id
